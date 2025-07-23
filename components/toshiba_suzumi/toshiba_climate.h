@@ -6,6 +6,8 @@
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/select/select.h"
 #include "toshiba_climate_mode.h"
+#include "esphome/core/component.h"
+
 
 namespace esphome {
 namespace toshiba_suzumi {
@@ -40,6 +42,8 @@ struct ToshibaCommand {
 
 class ToshibaClimateUart : public PollingComponent, public climate::Climate, public uart::UARTDevice {
  public:
+  public:
+  void set_external_sensor(esphome::sensor::Sensor *sensor) { external_sensor_ = sensor; }
   void setup() override;
   void loop() override;
   void dump_config() override;
@@ -56,6 +60,7 @@ class ToshibaClimateUart : public PollingComponent, public climate::Climate, pub
 
  protected:
   /// Override control to change settings of the climate device.
+  esphome::sensor::Sensor *external_sensor_{nullptr};
   void control(const climate::ClimateCall &call) override;
 
   /// Return the traits of this controller.
