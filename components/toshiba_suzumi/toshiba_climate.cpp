@@ -261,14 +261,25 @@ void ToshibaClimateUart::parseResponse(std::vector<uint8_t> rawData) {
       this->swing_mode = swingMode;
       break;
     }
+    
+    
     case ToshibaCommandType::MODE: {
-      auto mode = IntToClimateMode(static_cast<MODE>(value));
-      ESP_LOGI(TAG, "Received AC mode: %s", climate_mode_to_string(mode));
-      if (this->power_state_ == STATE::ON) {
-        this->mode = mode;
-      }
-      break;
-    }
+  auto mode = IntToClimateMode(static_cast<MODE>(value));
+  if (static_cast<MODE>(value) == MODE::AUTO) {
+    ESP_LOGI(TAG, "AUTO mode active: Inverter is running in native AUTO mode.");
+  } else {
+    ESP_LOGI(TAG, "Received AC mode: %s", climate_mode_to_string(mode));
+  }
+  if (this->power_state_ == STATE::ON) {
+    this->mode = mode;
+  }
+  break;
+}
+    
+    
+    
+    
+    
     case ToshibaCommandType::ROOM_TEMP:
       ESP_LOGI(TAG, "Received room temp: %d °C", value);
       this->current_temperature = value;
@@ -345,23 +356,42 @@ void ToshibaClimateUart::update() {
   }
 }
 
-void ToshibaClimateUart::control(const climate::ClimateCall &call) {
+  
+  void ToshibaClimateUart::control(const climate::ClimateCall &call) {
   if (call.get_mode().has_value()) {
     ClimateMode mode = *call.get_mode();
     ESP_LOGD(TAG, "Setting mode to %s", climate_mode_to_string(mode));
-    if (this->mode == CLIMATE_MODE_OFF && mode != CLIMATE_MODE_OFF) {
+
+    // Handle AUTO/HEAT_COOL mode
+    if (mode == climate::CLIMATE_MODE_HEAT_COOL) { // Use namespace or correct enum
+      ESP_LOGI(TAG, "Setting AC mode to native AUTO (HEAT_COOL)");
+      if (this->mode == climate::CLIMATE_MODE_OFF) { // Use correct enum
+        this->sendCmd(ToshibaCommandType::POWER_STATE, static_cast<uint8_t>(STATE::ON));
+      }
+      this->sendCmd(ToshibaCommandType::MODE, static_cast<uint8_t>(MODE::AUTO)); // Use correct value
+      this->mode = mode;
+      // If you have an 'action' member, set it. If not, remove or implement correctly.
+      // this->action = climate::CLIMATE_ACTION_OFF;
+      this->publish_state();
+      return;
+    }
+
+    if (this->mode == climate::CLIMATE_MODE_OFF && mode != climate::CLIMATE_MODE_OFF) {
       ESP_LOGD(TAG, "Setting AC unit power state to ON.");
       this->sendCmd(ToshibaCommandType::POWER_STATE, static_cast<uint8_t>(STATE::ON));
     }
-    if (mode == CLIMATE_MODE_OFF) {
+    if (mode == climate::CLIMATE_MODE_OFF) {
       ESP_LOGD(TAG, "Setting AC unit power state to OFF.");
       this->sendCmd(ToshibaCommandType::POWER_STATE, static_cast<uint8_t>(STATE::OFF));
     } else {
       auto requestedMode = ClimateModeToInt(mode);
       this->sendCmd(ToshibaCommandType::MODE, static_cast<uint8_t>(requestedMode));
     }
+
     this->mode = mode;
   }
+  
+
 
   if (call.get_target_temperature().has_value()) {
     auto target_temp = *call.get_target_temperature();

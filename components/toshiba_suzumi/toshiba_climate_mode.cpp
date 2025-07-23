@@ -23,6 +23,7 @@ const MODE ClimateModeToInt(climate::ClimateMode mode) {
       return MODE::HEAT_COOL;
   }
 }
+static const auto CLIMATE_MODE_HEAT_COOL = 2; // Should match esphome's definitions
 
 const climate::ClimateMode IntToClimateMode(MODE mode) {
   switch (mode) {

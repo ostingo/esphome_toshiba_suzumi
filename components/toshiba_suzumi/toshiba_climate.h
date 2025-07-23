@@ -10,6 +10,7 @@
 namespace esphome {
 namespace toshiba_suzumi {
 
+
 static const char *const TAG = "ToshibaClimateUart";
 // default max temp for units
 static const uint8_t MAX_TEMP = 30;
