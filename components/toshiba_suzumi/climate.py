@@ -30,6 +30,7 @@ toshiba_ns = cg.esphome_ns.namespace("toshiba_suzumi")
 ToshibaClimateUart = toshiba_ns.class_("ToshibaClimateUart", cg.PollingComponent, climate.Climate, uart.UARTDevice)
 ToshibaPwrModeSelect = toshiba_ns.class_('ToshibaPwrModeSelect', select.Select)
 ToshibaSpecialModeSelect = toshiba_ns.class_('ToshibaSpecialModeSelect', select.Select)
+CONF_EXTERNAL_SENSOR_ID = "external_sensor_id"
 
 if version.parse(ESPHOME_VERSION) >= version.parse("2025.5.0"):
     _LOGGER.info("[TOSHIBA SUZUMI] Using new climate schema (ESPHome >= 2025.5.0)")
@@ -42,6 +43,12 @@ if version.parse(ESPHOME_VERSION) >= version.parse("2025.5.0"):
                     device_class=DEVICE_CLASS_TEMPERATURE,
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
+             cv.Optional(CONF_ROOM_TEMP): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_CELSIUS,
+                    device_class=DEVICE_CLASS_TEMPERATURE,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+            cv.Optional(CONF_EXTERNAL_SENSOR_ID): cv.use_id(sensor.Sensor),
             cv.Optional(CONF_PWR_SELECT): select.select_schema(ToshibaPwrModeSelect).extend({
                 cv.GenerateID(): cv.declare_id(ToshibaPwrModeSelect),
             }),
