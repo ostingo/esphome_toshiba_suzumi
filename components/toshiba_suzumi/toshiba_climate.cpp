@@ -357,9 +357,6 @@ void ToshibaClimateUart::update() {
   if (outdoor_temp_sensor_ != nullptr) {
     this->requestData(ToshibaCommandType::OUTDOOR_TEMP);
   }
-}
-
-
 
   // --- Fan speed delay logic ---
   // Only act if device is ON, not OFF
@@ -385,6 +382,8 @@ void ToshibaClimateUart::update() {
     }
   }
 }
+
+
   void ToshibaClimateUart::control(const climate::ClimateCall &call) {
   if (call.get_mode().has_value()) {
     ClimateMode mode = *call.get_mode();
