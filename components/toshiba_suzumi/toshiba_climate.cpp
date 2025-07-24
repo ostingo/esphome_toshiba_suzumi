@@ -233,37 +233,42 @@ void ToshibaClimateUart::parseResponse(std::vector<uint8_t> rawData) {
       this->target_temperature = value;
       break;
 
-    case ToshibaCommandType::FAN: {
-      
-      ESP_LOGI(TAG, "Received FAN reply value: %d", value);
-      if (static_cast<FAN>(value) == FAN::FAN_AUTO) {
-        ESP_LOGI(TAG, "Received fan mode: AUTO");
-        this->set_fan_mode_(CLIMATE_FAN_AUTO);
-      } else if (static_cast<FAN>(value) == FAN::FAN_QUIET) {
-        ESP_LOGI(TAG, "Received fan mode: QUIET");
-        this->set_fan_mode_(CLIMATE_FAN_QUIET);
-      } else if (static_cast<FAN>(value) == FAN::FAN_LOW) {
-        ESP_LOGI(TAG, "Received fan mode: LOW");
-        this->set_fan_mode_(CLIMATE_FAN_LOW);
-      } else if (static_cast<FAN>(value) == FAN::FAN_MEDIUM) {
-        ESP_LOGI(TAG, "Received fan mode: MEDIUM");
-        this->set_fan_mode_(CLIMATE_FAN_MEDIUM);
-      } else if (static_cast<FAN>(value) == FAN::FAN_HIGH) {
-        ESP_LOGI(TAG, "Received fan mode: HIGH");
-        this->set_fan_mode_(CLIMATE_FAN_HIGH);
-      } else {
-        auto fanMode = IntToCustomFanMode(static_cast<FAN>(value));
-        ESP_LOGI(TAG, "Received fan mode: %s", fanMode.c_str());
-        this->set_custom_fan_mode_(fanMode);
-      }
+   case ToshibaCommandType::FAN: {
+  ESP_LOGI(TAG, "Received FAN reply value: %d", value);
+
+  FAN fan_value = static_cast<FAN>(value);
+
+  switch (fan_value) {
+    case FAN::FAN_AUTO:
+      ESP_LOGI(TAG, "Received fan mode: AUTO");
+      this->set_fan_mode_(CLIMATE_FAN_AUTO);
+      break;
+    case FAN::FAN_QUIET:
+      ESP_LOGI(TAG, "Received fan mode: QUIET");
+      this->set_fan_mode_(CLIMATE_FAN_QUIET);
+      break;
+    case FAN::FAN_LOW:
+      ESP_LOGI(TAG, "Received fan mode: LOW");
+      this->set_fan_mode_(CLIMATE_FAN_LOW);
+      break;
+    case FAN::FAN_MEDIUM:
+      ESP_LOGI(TAG, "Received fan mode: MEDIUM");
+      this->set_fan_mode_(CLIMATE_FAN_MEDIUM);
+      break;
+    case FAN::FAN_HIGH:
+      ESP_LOGI(TAG, "Received fan mode: HIGH");
+      this->set_fan_mode_(CLIMATE_FAN_HIGH);
+      break;
+    default: {
+      auto fanMode = IntToCustomFanMode(fan_value);
+      ESP_LOGI(TAG, "Received fan mode (custom): %s", fanMode.c_str());
+      this->set_custom_fan_mode_(fanMode);
       break;
     }
-    case ToshibaCommandType::SWING: {
-      auto swingMode = IntToClimateSwingMode(static_cast<SWING>(value));
-      ESP_LOGI(TAG, "Received swing mode: %s", climate_swing_mode_to_string(swingMode));
-      this->swing_mode = swingMode;
-      break;
-    }
+  }
+  break;
+}
+
     
     
     case ToshibaCommandType::MODE: {
