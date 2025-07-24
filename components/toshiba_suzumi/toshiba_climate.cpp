@@ -232,7 +232,9 @@ void ToshibaClimateUart::parseResponse(std::vector<uint8_t> rawData) {
       }
       this->target_temperature = value;
       break;
+
     case ToshibaCommandType::FAN: {
+      ESP_LOGI(TAG, "Received FAN reply value: %d", value);
       if (static_cast<FAN>(value) == FAN::FAN_AUTO) {
         ESP_LOGI(TAG, "Received fan mode: AUTO");
         this->set_fan_mode_(CLIMATE_FAN_AUTO);
@@ -373,6 +375,8 @@ if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
     if (this->reached_temp_time_ == 0) {
       // Start timer
       this->reached_temp_time_ = millis();
+
+  
     } else if (millis() - this->reached_temp_time_ > this->fan_speed_delay_ * 1000) {
       // Delay elapsed: lower fan
       ESP_LOGI(TAG, "Lowering fan to LOW after %u sec delay.", this->fan_speed_delay_);
@@ -388,7 +392,7 @@ if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
 
 }
 
-
+ESP_LOGD(TAG, "Update: cur=%.2f, tgt=%.2f, fan=%d, time=%u", this->current_temperature, this->target_temperature, this->fan_mode, this->reached_temp_time_);
   void ToshibaClimateUart::control(const climate::ClimateCall &call) {
   if (call.get_mode().has_value()) {
     ClimateMode mode = *call.get_mode();
