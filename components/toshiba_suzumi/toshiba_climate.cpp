@@ -403,13 +403,12 @@ if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
   }
 
 }
-
-ESP_LOGD(TAG, "Update: cur=%.2f, tgt=%.2f, fan=%d, time=%u", this->current_temperature, this->target_temperature, this->fan_mode, this->reached_temp_time_);
   void ToshibaClimateUart::control(const climate::ClimateCall &call) {
   if (call.get_mode().has_value()) {
     ClimateMode mode = *call.get_mode();
     ESP_LOGD(TAG, "Setting mode to %s", climate_mode_to_string(mode));
 
+    ESP_LOGD(TAG, "Update: cur=%.2f, tgt=%.2f, fan=%d, time=%u", this->current_temperature, this->target_temperature, this->fan_mode, this->reached_temp_time_);
     // Handle AUTO/HEAT_COOL mode
     if (mode == climate::CLIMATE_MODE_HEAT_COOL) { // Use namespace or correct enum
       ESP_LOGI(TAG, "Setting AC mode to native AUTO (HEAT_COOL)");
