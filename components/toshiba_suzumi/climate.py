@@ -21,7 +21,7 @@ CONF_OUTDOOR_TEMP = "outdoor_temp"
 CONF_PWR_SELECT = "power_select"
 CONF_SPECIAL_MODE = "special_mode"
 CONF_SPECIAL_MODE_MODES = "modes"
-
+CONF_FAN_SPEED_DELAY = "fan_speed_delay"  # <-- NEW
 FEATURE_HORIZONTAL_SWING = "horizontal_swing"
 MIN_TEMP = "min_temp"
 DISABLE_WIFI_LED = "disable_wifi_led"
@@ -59,6 +59,7 @@ if version.parse(ESPHOME_VERSION) >= version.parse("2025.5.0"):
                 cv.Required(CONF_SPECIAL_MODE_MODES): cv.ensure_list(cv.one_of("Standard","Hi POWER","ECO","Fireplace 1","Fireplace 2","8 degrees","Silent#1","Silent#2","Sleep","Floor","Comfort"))
             }),
             cv.Optional(MIN_TEMP): cv.int_,
+            cv.Optional(CONF_FAN_SPEED_DELAY, default=30): cv.positive_int,  # <-- NEW
         }
     ).extend(uart.UART_DEVICE_SCHEMA).extend(cv.polling_component_schema("120s"))    
 else:
@@ -82,6 +83,7 @@ else:
                 cv.Required(CONF_SPECIAL_MODE_MODES): cv.ensure_list(cv.one_of("Standard","Hi POWER","ECO","Fireplace 1","Fireplace 2","8 degrees","Silent#1","Silent#2","Sleep","Floor","Comfort"))
             }),
             cv.Optional(MIN_TEMP): cv.int_,
+            cv.Optional(CONF_FAN_SPEED_DELAY, default=30): cv.positive_int,  # <-- NEW
         }
     ).extend(uart.UART_DEVICE_SCHEMA).extend(cv.polling_component_schema("120s"))
 
@@ -129,3 +131,6 @@ async def to_code(config):
             cg.add(var.set_min_temp(5))
         await cg.register_parented(sel, config[CONF_ID])
         cg.add(var.set_special_mode_select(sel))
+
+    # --- Pass fan speed delay to C++ ---
+    cg.add(var.set_fan_speed_delay(config.get(CONF_FAN_SPEED_DELAY, 30)))
