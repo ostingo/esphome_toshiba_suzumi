@@ -99,7 +99,7 @@ async def to_code(config):
 if self.current_temp >= self.target_temp and self.fan_mode != 'low':
     if not self.reached_temp_time:
         self.reached_temp_time = now()
-    elif now() - self.reached_temp_time > 30:    # Use 30 for seconds delay
+    elif now() - self.reached_temp_time > 30:    # 30 seconds delay
         self.set_fan_mode('low')
 else:
     self.reached_temp_time = None
