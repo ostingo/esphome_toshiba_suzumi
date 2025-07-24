@@ -359,7 +359,36 @@ void ToshibaClimateUart::update() {
   }
 }
 
-  
+  void ToshibaClimateUart::update() {
+  this->requestData(ToshibaCommandType::ROOM_TEMP);
+  if (outdoor_temp_sensor_ != nullptr) {
+    this->requestData(ToshibaCommandType::OUTDOOR_TEMP);
+  }
+
+  // --- Fan speed delay logic ---
+  // Only act if device is ON, not OFF
+  if (this->power_state_ == STATE::ON) {
+    // Ensure we have valid temperatures
+    if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
+      // If we've reached (or exceeded) target and fan is NOT LOW:
+      if (this->current_temperature >= this->target_temperature &&
+          this->fan_mode != CLIMATE_FAN_LOW) {
+        if (this->reached_temp_time_ == 0) {
+          // Start timer
+          this->reached_temp_time_ = millis();
+        } else if (millis() - this->reached_temp_time_ > this->fan_speed_delay_ * 1000) {
+          // Delay elapsed: lower fan
+          ESP_LOGI(TAG, "Target temp reached, lowering fan to LOW after %u sec delay.", this->fan_speed_delay_);
+          this->set_fan_mode_(CLIMATE_FAN_LOW);
+          this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_LOW));
+        }
+      } else {
+        // If not at target or fan is LOW, reset timer
+        this->reached_temp_time_ = 0;
+      }
+    }
+  }
+}
   void ToshibaClimateUart::control(const climate::ClimateCall &call) {
   if (call.get_mode().has_value()) {
     ClimateMode mode = *call.get_mode();
