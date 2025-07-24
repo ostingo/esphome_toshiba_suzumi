@@ -361,32 +361,31 @@ void ToshibaClimateUart::update() {
   // --- Fan speed delay logic ---
   // Only act if device is ON, not OFF
   if (this->power_state_ == STATE::ON) {
-    // Ensure we have valid temperatures
-    if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
-      // If we've reached (or exceeded) target and fan is NOT LOW:
-      float temp_diff = abs(this->current_temperature - this->target_temperature);
-    if (temp_diff <= 0.5) {
-      ESP_LOGI(TAG, "Target temperature reached: current=%.2f, target=%.2f, difference=%.2f", 
-             this->current_temperature, this->target_temperature, temp_diff);
-    // ... (fan logic goes here)
-}
+  // Ensure we have valid temperatures
+if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
+  float temp_diff = abs(this->current_temperature - this->target_temperature);
 
-          this->fan_mode != CLIMATE_FAN_LOW) {
-        if (this->reached_temp_time_ == 0) {
-          // Start timer
-          this->reached_temp_time_ = millis();
-        } else if (millis() - this->reached_temp_time_ > this->fan_speed_delay_ * 1000) {
-          // Delay elapsed: lower fan
-          ESP_LOGI(TAG, "Target temp reached, lowering fan to LOW after %u sec delay.", this->fan_speed_delay_);
-          this->set_fan_mode_(CLIMATE_FAN_LOW);
-          this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_LOW));
-        }
-      } else {
-        // If not at target or fan is LOW, reset timer
-        this->reached_temp_time_ = 0;
-      }
+  // If we've reached (or are within 0.5°C of) target and fan is NOT LOW:
+  if (temp_diff <= 0.5 && this->fan_mode != CLIMATE_FAN_LOW) {
+    ESP_LOGI(TAG, "Target temperature reached: current=%.2f, target=%.2f, difference=%.2f", 
+             this->current_temperature, this->target_temperature, temp_diff);
+
+    if (this->reached_temp_time_ == 0) {
+      // Start timer
+      this->reached_temp_time_ = millis();
+    } else if (millis() - this->reached_temp_time_ > this->fan_speed_delay_ * 1000) {
+      // Delay elapsed: lower fan
+      ESP_LOGI(TAG, "Lowering fan to LOW after %u sec delay.", this->fan_speed_delay_);
+      this->set_fan_mode_(CLIMATE_FAN_LOW);
+      this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_LOW));
     }
+  } else {
+    // If not at target or fan is LOW, reset timer
+    this->reached_temp_time_ = 0;
   }
+}
+  }
+
 }
 
 
