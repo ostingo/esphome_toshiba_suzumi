@@ -360,8 +360,7 @@ void ToshibaClimateUart::dump_config() {
  * It servers two purposes - updates data and is like "watchdog" because
  * some people reported that without communication, the unit might stop responding.
  */
-void ToshibaClimateUart::update() {
-  
+ void ToshibaClimateUart::update() {
   ESP_LOGD(TAG, "Update: cur=%.2f, tgt=%.2f, fan=%d, time=%u",
            this->current_temperature,
            this->target_temperature,
@@ -373,36 +372,49 @@ void ToshibaClimateUart::update() {
   }
 
   // --- Fan speed delay logic ---
+  constexpr float LOW_FAN_THRESHOLD = 0.5;    // Change this as needed
+  constexpr float MED_FAN_THRESHOLD = 1.0;    // Optionally add MEDIUM threshold
   // Only act if device is ON, not OFF
   if (this->power_state_ == STATE::ON) {
-  // Ensure we have valid temperatures
-if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
-  float temp_diff = abs(this->current_temperature - this->target_temperature);
+    // Ensure we have valid temperatures
+    if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
+      float temp_diff = fabs(this->current_temperature - this->target_temperature);
 
-  // If we've reached (or are within 0.5°C of) target and fan is NOT LOW:
-  if (temp_diff <= 0.5 && this->fan_mode != CLIMATE_FAN_LOW) {
-    ESP_LOGI(TAG, "Target temperature reached: current=%.2f, target=%.2f, difference=%.2f", 
-             this->current_temperature, this->target_temperature, temp_diff);
+      // If temp is very close to target, drop to LOW
+      if (temp_diff <= LOW_FAN_THRESHOLD && this->fan_mode != CLIMATE_FAN_LOW) {
+        ESP_LOGI(TAG, "Target temp reached: current=%.2f, target=%.2f, diff=%.2f (LOW fan logic)", 
+                 this->current_temperature, this->target_temperature, temp_diff);
 
-    if (this->reached_temp_time_ == 0) {
-      // Start timer
-      this->reached_temp_time_ = millis();
-
-  
-    } else if (millis() - this->reached_temp_time_ > this->fan_speed_delay_ * 1000) {
-      // Delay elapsed: lower fan
-      ESP_LOGI(TAG, "Lowering fan to LOW after %u sec delay.", this->fan_speed_delay_);
-      this->set_fan_mode_(CLIMATE_FAN_LOW);
-      this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_LOW));
+        if (this->reached_temp_time_ == 0) {
+          this->reached_temp_time_ = millis();
+          ESP_LOGD(TAG, "Starting fan speed delay timer at %u ms", this->reached_temp_time_);
+        } else if (millis() - this->reached_temp_time_ > this->fan_speed_delay_ * 1000) {
+          ESP_LOGI(TAG, "Lowering fan to LOW after %u sec delay.", this->fan_speed_delay_);
+          this->set_fan_mode_(CLIMATE_FAN_LOW);
+          this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_LOW));
+        }
+      }
+      // Optionally: If temp is close but not very close, drop to MEDIUM
+      else if (temp_diff <= MED_FAN_THRESHOLD && this->fan_mode == CLIMATE_FAN_HIGH) {
+        ESP_LOGI(TAG, "Temp close to target: current=%.2f, target=%.2f, diff=%.2f (MEDIUM fan logic)", 
+                 this->current_temperature, this->target_temperature, temp_diff);
+        this->set_fan_mode_(CLIMATE_FAN_MEDIUM);
+        this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_MEDIUM));
+        this->reached_temp_time_ = 0;
+      }
+      else {
+        // If not close enough or already at LOW, reset timer
+        if (this->reached_temp_time_ != 0) {
+          ESP_LOGD(TAG, "Resetting fan speed delay timer (not close enough to target or already LOW)");
+        }
+        this->reached_temp_time_ = 0;
+      }
     }
-  } else {
-    // If not at target or fan is LOW, reset timer
-    this->reached_temp_time_ = 0;
   }
 }
-  }
+ 
 
-}
+
   void ToshibaClimateUart::control(const climate::ClimateCall &call) {
   if (call.get_mode().has_value()) {
     ClimateMode mode = *call.get_mode();
