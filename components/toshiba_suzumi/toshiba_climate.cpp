@@ -364,7 +364,13 @@ void ToshibaClimateUart::update() {
     // Ensure we have valid temperatures
     if (!isnan(this->current_temperature) && !isnan(this->target_temperature)) {
       // If we've reached (or exceeded) target and fan is NOT LOW:
-      if (this->current_temperature >= this->target_temperature &&
+      float temp_diff = abs(this->current_temperature - this->target_temperature);
+    if (temp_diff <= 0.5) {
+      ESP_LOGI(TAG, "Target temperature reached: current=%.2f, target=%.2f, difference=%.2f", 
+             this->current_temperature, this->target_temperature, temp_diff);
+    // ... (fan logic goes here)
+}
+
           this->fan_mode != CLIMATE_FAN_LOW) {
         if (this->reached_temp_time_ == 0) {
           // Start timer
