@@ -234,6 +234,7 @@ void ToshibaClimateUart::parseResponse(std::vector<uint8_t> rawData) {
       break;
 
     case ToshibaCommandType::FAN: {
+      
       ESP_LOGI(TAG, "Received FAN reply value: %d", value);
       if (static_cast<FAN>(value) == FAN::FAN_AUTO) {
         ESP_LOGI(TAG, "Received fan mode: AUTO");
