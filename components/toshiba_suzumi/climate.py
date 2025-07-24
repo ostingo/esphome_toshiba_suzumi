@@ -90,16 +90,23 @@ async def to_code(config):
     await cg.register_component(var, config)
     await climate.register_climate(var, config)
     await uart.register_uart_device(var, config)
-    
-     # --- External sensor support ---
+
+    # --- External sensor support ---
     if CONF_EXTERNAL_SENSOR_ID in config:
         ext_sensor = await cg.get_variable(config[CONF_EXTERNAL_SENSOR_ID])
         cg.add(var.set_external_sensor(ext_sensor))
 
-    # --- Outdoor temp sensor ---ONF_OUTDOOR_TEMP in config:
+    # --- Outdoor temp sensor ---
+    if CONF_OUTDOOR_TEMP in config:
         conf = config[CONF_OUTDOOR_TEMP]
         sens = await sensor.new_sensor(conf)
         cg.add(var.set_outdoor_temp_sensor(sens))
+
+    # --- Room temp sensor (if supported in your C++) ---
+    if CONF_ROOM_TEMP in config:
+        conf = config[CONF_ROOM_TEMP]
+        sens = await sensor.new_sensor(conf)
+        cg.add(var.set_room_temp_sensor(sens))
 
     if CONF_PWR_SELECT in config:
         sel = await select.new_select(config[CONF_PWR_SELECT], options=['50 %', '75 %', '100 %'])
