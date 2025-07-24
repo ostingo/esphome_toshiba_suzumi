@@ -361,6 +361,12 @@ void ToshibaClimateUart::dump_config() {
  * some people reported that without communication, the unit might stop responding.
  */
 void ToshibaClimateUart::update() {
+  
+  ESP_LOGD(TAG, "Update: cur=%.2f, tgt=%.2f, fan=%d, time=%u",
+           this->current_temperature,
+           this->target_temperature,
+           this->fan_mode,
+           this->reached_temp_time_);
   this->requestData(ToshibaCommandType::ROOM_TEMP);
   if (outdoor_temp_sensor_ != nullptr) {
     this->requestData(ToshibaCommandType::OUTDOOR_TEMP);
