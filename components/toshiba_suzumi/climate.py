@@ -96,13 +96,13 @@ async def to_code(config):
         ext_sensor = await cg.get_variable(config[CONF_EXTERNAL_SENSOR_ID])
         cg.add(var.set_external_sensor(ext_sensor))
     # Target temperature reached ... fan speed lower
-if self.current_temp >= self.target_temp and self.fan_mode != 'low':
-    if not self.reached_temp_time:
+    if self.current_temp >= self.target_temp and self.fan_mode != 'low':
+        if not self.reached_temp_time:
         self.reached_temp_time = now()
-    elif now() - self.reached_temp_time > 30:    # 30 seconds delay
+        elif now() - self.reached_temp_time > 30:    # 30 seconds delay
         self.set_fan_mode('low')
-else:
-    self.reached_temp_time = None
+    else:
+        self.reached_temp_time = None
     # --- Outdoor temp sensor ---
     if CONF_OUTDOOR_TEMP in config:
         conf = config[CONF_OUTDOOR_TEMP]
