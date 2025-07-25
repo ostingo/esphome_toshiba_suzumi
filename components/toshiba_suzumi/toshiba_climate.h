@@ -8,12 +8,7 @@
 #include "toshiba_climate_mode.h"
 #include "esphome/core/component.h"
 
-// In your .h file (header), add the prototype:
-class ToshibaClimateUart : public PollingComponent, public climate::Climate, public uart::UARTDevice {
 
-  void update_fan_speed_based_on_temp_diff();
-  
-};
 
 namespace esphome {
 namespace toshiba_suzumi {
@@ -45,6 +40,7 @@ struct ToshibaCommand {
 
 class ToshibaClimateUart : public PollingComponent, public climate::Climate, public uart::UARTDevice {
  public:
+  void update_fan_speed_based_on_temp_diff();
   void set_external_sensor(esphome::sensor::Sensor *sensor) { external_sensor_ = sensor; }
   void setup() override;
   void loop() override;
