@@ -58,6 +58,7 @@ class ToshibaClimateUart : public PollingComponent, public climate::Climate, pub
   void set_fan_speed_delay(uint32_t delay) { fan_speed_delay_ = delay; }  // <-- FAN SPEED DELAY SETTER
 
  protected:
+  climate::ClimateFanMode last_requested_fan_mode_ = climate::CLIMATE_FAN_AUTO;
   esphome::sensor::Sensor *external_sensor_{nullptr};
   void control(const climate::ClimateCall &call) override;
   climate::ClimateTraits traits() override;
