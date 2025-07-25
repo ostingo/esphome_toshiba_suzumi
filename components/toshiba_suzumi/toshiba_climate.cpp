@@ -402,6 +402,7 @@ void ToshibaClimateUart::dump_config() {
           }
         }
       }
+        ESP_LOGI(TAG, "Sent fan command: %d, AC replied: %d", requested, actual);
       // 2. MEDIUM fan when temperature difference is MEDIUM (~0.5-1.0°C), triggered from HIGH only
       else if (temp_diff > LOW_FAN_THRESHOLD && temp_diff <= MED_FAN_THRESHOLD && 
                this->fan_mode == CLIMATE_FAN_HIGH) {
