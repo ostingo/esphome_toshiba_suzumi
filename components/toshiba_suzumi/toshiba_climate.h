@@ -9,7 +9,8 @@
 #include "esphome/core/component.h"
 
 // In your .h file (header), add the prototype:
-class ToshibaClimateUart : ... {
+class ToshibaClimateUart : public PollingComponent, public climate::Climate, public uart::UARTDevice {
+
   // ...
   void update_fan_speed_based_on_temp_diff();
   // ...
