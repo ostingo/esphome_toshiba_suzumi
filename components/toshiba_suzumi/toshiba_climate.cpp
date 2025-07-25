@@ -373,9 +373,9 @@ void ToshibaClimateUart::dump_config() {
   }
 
   // --- Enhanced Fan speed adjustment logic ---
-  constexpr float LOW_FAN_THRESHOLD = 0.5;    // Temperature difference for LOW fan
-  constexpr float MED_FAN_THRESHOLD = 1.0;    // Temperature difference for MEDIUM fan
-  constexpr float HIGH_FAN_THRESHOLD = 1.5;   // Temperature difference for HIGH fan
+  constexpr float LOW_FAN_THRESHOLD = 0.75;    // Temperature difference for LOW fan
+  constexpr float MED_FAN_THRESHOLD = 1.25;    // Temperature difference for MEDIUM fan
+  constexpr float HIGH_FAN_THRESHOLD = 1.75;   // Temperature difference for HIGH fan
   
   // Only act if device is ON, not OFF
   if (this->power_state_ == STATE::ON) {
