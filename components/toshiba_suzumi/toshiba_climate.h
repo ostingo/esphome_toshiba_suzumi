@@ -8,6 +8,13 @@
 #include "toshiba_climate_mode.h"
 #include "esphome/core/component.h"
 
+// In your .h file (header), add the prototype:
+class ToshibaClimateUart : ... {
+  // ...
+  void update_fan_speed_based_on_temp_diff();
+  // ...
+};
+
 namespace esphome {
 namespace toshiba_suzumi {
 
