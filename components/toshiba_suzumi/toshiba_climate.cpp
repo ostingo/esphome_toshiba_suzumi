@@ -342,22 +342,6 @@ void ToshibaClimateUart::dump_config() {
  * some people reported that without communication, the unit might stop responding.
  */
 
-void ToshibaClimateUart::update() {
-  ESP_LOGD(TAG, "Update: cur=%.2f, tgt=%.2f, fan=%d, mode=%d, time=%u",
-           this->current_temperature,
-           this->target_temperature,
-           this->fan_mode,
-           this->mode,
-           this->reached_temp_time_);
-  this->requestData(ToshibaCommandType::ROOM_TEMP);
-  if (outdoor_temp_sensor_ != nullptr) {
-    this->requestData(ToshibaCommandType::OUTDOOR_TEMP);
-  }
-
-  this->update_fan_speed_based_on_temp_diff();
-}
-
-// Define update_fan_speed_based_on_temp_diff() as its own function:
 void ToshibaClimateUart::update_fan_speed_based_on_temp_diff() {
   constexpr float LOW_FAN_THRESHOLD = 0.75;
   constexpr float MED_FAN_THRESHOLD = 1.25;
@@ -369,39 +353,44 @@ void ToshibaClimateUart::update_fan_speed_based_on_temp_diff() {
       bool is_heat_or_cool_mode = (this->mode == climate::CLIMATE_MODE_HEAT ||
                                    this->mode == climate::CLIMATE_MODE_COOL);
 
+      // If the difference is large, go HIGH
       if (temp_diff > HIGH_FAN_THRESHOLD) {
-        if (this->fan_mode != CLIMATE_FAN_HIGH && (is_heat_or_cool_mode || this->fan_mode != CLIMATE_FAN_AUTO)) {
+        if (this->fan_mode != CLIMATE_FAN_HIGH) {
           this->set_fan_mode_(CLIMATE_FAN_HIGH);
           this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_HIGH));
-          if (this->reached_temp_time_ != 0) this->reached_temp_time_ = 0;
         }
-      } else if (temp_diff > LOW_FAN_THRESHOLD && temp_diff <= MED_FAN_THRESHOLD &&
-                 this->fan_mode == CLIMATE_FAN_HIGH) {
-        this->set_fan_mode_(CLIMATE_FAN_MEDIUM);
-        this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_MEDIUM));
-        if (this->reached_temp_time_ != 0) this->reached_temp_time_ = 0;
-      } else if (temp_diff <= LOW_FAN_THRESHOLD && this->fan_mode != CLIMATE_FAN_LOW) {
-        if (is_heat_or_cool_mode && temp_diff > (LOW_FAN_THRESHOLD * 0.8)) {
-          if (this->reached_temp_time_ != 0) this->reached_temp_time_ = 0;
-        } else {
-          if (this->reached_temp_time_ == 0) {
-            this->reached_temp_time_ = millis();
-          } else if (millis() - this->reached_temp_time_ > this->fan_speed_delay_ * 1000) {
+        this->reached_temp_time_ = 0; // Reset timer
+      }
+      // If the difference is medium, go MEDIUM
+      else if (temp_diff > LOW_FAN_THRESHOLD && temp_diff <= MED_FAN_THRESHOLD) {
+        if (this->fan_mode != CLIMATE_FAN_MEDIUM) {
+          this->set_fan_mode_(CLIMATE_FAN_MEDIUM);
+          this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_MEDIUM));
+        }
+        this->reached_temp_time_ = 0; // Reset timer
+      }
+      // If the difference is small, go LOW after delay
+      else if (temp_diff <= LOW_FAN_THRESHOLD) {
+        if (this->reached_temp_time_ == 0) {
+          this->reached_temp_time_ = millis(); // Start delay timer
+        }
+        // Only drop to LOW if delay timer has expired
+        if ((millis() - this->reached_temp_time_) > (this->fan_speed_delay_ * 1000)) {
+          if (this->fan_mode != CLIMATE_FAN_LOW) {
             this->set_fan_mode_(CLIMATE_FAN_LOW);
             this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_LOW));
           }
         }
-      } else {
-        if (this->reached_temp_time_ != 0) this->reached_temp_time_ = 0;
       }
     } else {
-      if (this->reached_temp_time_ != 0) this->reached_temp_time_ = 0;
+      this->reached_temp_time_ = 0;
     }
   } else {
-    if (this->reached_temp_time_ != 0) this->reached_temp_time_ = 0;
+    this->reached_temp_time_ = 0;
   }
 }
- 
+
+
 
 
   void ToshibaClimateUart::control(const climate::ClimateCall &call) {
