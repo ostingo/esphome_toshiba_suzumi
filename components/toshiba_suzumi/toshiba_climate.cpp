@@ -232,7 +232,7 @@ void ToshibaClimateUart::parseResponse(std::vector<uint8_t> rawData) {
       }
       this->target_temperature = value;
       break;
-    
+  
   case ToshibaCommandType::FAN: {
   ESP_LOGI(TAG, "Received FAN reply value: %d", value);
 
@@ -241,48 +241,28 @@ void ToshibaClimateUart::parseResponse(std::vector<uint8_t> rawData) {
 
   switch (fan_value) {
     case FAN::FAN_AUTO:
-      ESP_LOGI(TAG, "Received fan mode: AUTO");
       reported_mode = CLIMATE_FAN_AUTO;
-      this->set_fan_mode_(CLIMATE_FAN_AUTO);
       break;
     case FAN::FAN_QUIET:
-      ESP_LOGI(TAG, "Received fan mode: QUIET");
       reported_mode = CLIMATE_FAN_QUIET;
-      this->set_fan_mode_(CLIMATE_FAN_QUIET);
       break;
     case FAN::FAN_LOW:
-      ESP_LOGI(TAG, "Received fan mode: LOW");
       reported_mode = CLIMATE_FAN_LOW;
-      this->set_fan_mode_(CLIMATE_FAN_LOW);
       break;
     case FAN::FAN_MEDIUM:
-      ESP_LOGI(TAG, "Received fan mode: MEDIUM");
       reported_mode = CLIMATE_FAN_MEDIUM;
-      this->set_fan_mode_(CLIMATE_FAN_MEDIUM);
       break;
     case FAN::FAN_HIGH:
-      ESP_LOGI(TAG, "Received fan mode: HIGH");
       reported_mode = CLIMATE_FAN_HIGH;
-      this->set_fan_mode_(CLIMATE_FAN_HIGH);
       break;
-    default: {
-      auto fanMode = IntToCustomFanMode(fan_value);
-      ESP_LOGI(TAG, "Received fan mode (custom): %s", fanMode.c_str());
-      // If you want to handle custom fan modes, do it here.
+    default:
+      // handle custom, etc.
       break;
-    }
   }
-  // Log a warning if requested fan mode does not match reported
-  if (this->last_requested_fan_mode_ != reported_mode) {
-    ESP_LOGW(
-      TAG,
-      "Fan mode mismatch: requested %s, AC reports %s",
-      climate_fan_mode_to_string(this->last_requested_fan_mode_),
-      climate_fan_mode_to_string(reported_mode)
-    );
-  }
+  this->set_fan_mode_(reported_mode); // <--- ONLY here!
   break;
 }
+ 
 
     
     
