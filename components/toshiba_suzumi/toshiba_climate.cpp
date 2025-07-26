@@ -399,7 +399,7 @@ if (this->power_state_ == STATE::ON) {
     } else if (temp_diff > FAN_CUSTOM4_THRESHOLD) {
       if (this->custom_fan_mode_ != CUSTOM_FAN_LEVEL_4) {
         this->set_custom_fan_mode_(CUSTOM_FAN_LEVEL_4);
-        this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_CUSTOM4));
+        this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FANMODE_4));
         ESP_LOGI(TAG, "Fan set to CUSTOM_LEVEL_4 (%.2f < temp_diff ≤ %.2f)", FAN_CUSTOM4_THRESHOLD, FAN_HIGH_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
@@ -413,7 +413,7 @@ if (this->power_state_ == STATE::ON) {
     } else if (temp_diff > FAN_CUSTOM2_THRESHOLD) {
       if (this->custom_fan_mode_ != CUSTOM_FAN_LEVEL_2) {
         this->set_custom_fan_mode_(CUSTOM_FAN_LEVEL_2);
-        this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_CUSTOM2));
+        this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FANMODE_2));
         ESP_LOGI(TAG, "Fan set to CUSTOM_LEVEL_2 (%.2f < temp_diff ≤ %.2f)", FAN_CUSTOM2_THRESHOLD, FAN_MEDIUM_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
