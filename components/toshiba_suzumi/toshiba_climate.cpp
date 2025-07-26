@@ -431,27 +431,35 @@ if (this->power_state_ == STATE::ON) {
         ESP_LOGI(TAG, "Fan set to QUIET (temp_diff ≤ %.2f)", FAN_QUIET_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
-    } else {
-      // Reset timer if within mid-range but no transition applied
-      if (this->reached_temp_time_ != 0) {
-        ESP_LOGD(TAG, "Resetting fan speed delay timer - no matching fan range");
-        this->reached_temp_time_ = 0;
-      }
-    }
 
-  } else {
-    ESP_LOGW(TAG, "Invalid temperature readings - resetting delay timer");
+   //############################################ TIMER
+ } else {
+  // 4. Reset delay timer if conditions change or fan mode is not eligible for lowering
+  if (this->reached_temp_time_ != 0) {
+    ESP_LOGD(TAG, "Resetting fan speed delay timer - conditions changed (temp_diff=%.2f, fan_mode=%d)", 
+             temp_diff, this->fan_mode);
     this->reached_temp_time_ = 0;
   }
-} else {
-  ESP_LOGD(TAG, "AC is OFF - resetting delay timer");
-  this->reached_temp_time_ = 0;
 }
- }
-   //############################################
 
+} else {
+  // Invalid temperature readings - reset timer as a safety measure
+  if (this->reached_temp_time_ != 0) {
+    ESP_LOGW(TAG, "Resetting delay timer - invalid temperature readings (cur=%.2f, tgt=%.2f)", 
+             this->current_temperature, this->target_temperature);
+    this->reached_temp_time_ = 0;
+  }
+}
+} else {
+  // Device is OFF - reset timer
+  if (this->reached_temp_time_ != 0) {
+    ESP_LOGD(TAG, "Resetting delay timer - device is OFF");
+    this->reached_temp_time_ = 0;
+  }
+}
+   
  
-
+  //##################################
 
   void ToshibaClimateUart::control(const climate::ClimateCall &call) {
   if (call.get_mode().has_value()) {
