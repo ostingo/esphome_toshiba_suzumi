@@ -637,7 +637,9 @@ void ToshibaClimateUart::scan() {
     this->requestData(static_cast<ToshibaCommandType>(i));
   }
 }
-
+void esphome::toshiba_suzumi::ToshibaClimateUart::set_custom_fan_mode_(const std::string &mode) {
+    this->custom_fan_mode_ = mode;
+}
 }  // namespace toshiba_suzumi
 }  // namespace esphome
 
