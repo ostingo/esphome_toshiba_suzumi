@@ -447,7 +447,7 @@ if (this->power_state_ == STATE::ON) {
   ESP_LOGD(TAG, "AC is OFF - resetting delay timer");
   this->reached_temp_time_ = 0;
 }
-
+ }
    //############################################
 
  
