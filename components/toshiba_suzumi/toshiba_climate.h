@@ -79,7 +79,7 @@ class ToshibaClimateUart : public PollingComponent, public climate::Climate, pub
   sensor::Sensor *outdoor_temp_sensor_ = nullptr;
   bool horizontal_swing_ = false;
   uint8_t min_temp_ = 17;
-  uint8_t custom_fan_mode_ = 0;  // or an appropriate default value
+ 
   bool wifi_led_disabled_ = false;
   select::Select *special_mode_select_ = nullptr;
 
