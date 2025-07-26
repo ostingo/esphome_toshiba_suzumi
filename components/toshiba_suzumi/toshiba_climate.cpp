@@ -431,9 +431,8 @@ if (this->power_state_ == STATE::ON) {
         ESP_LOGI(TAG, "Fan set to QUIET (temp_diff ≤ %.2f)", FAN_QUIET_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
-
-   //############################################ TIMER
- } else {
+    //###############################
+} else {
   // 4. Reset delay timer if conditions change or fan mode is not eligible for lowering
   if (this->reached_temp_time_ != 0) {
     ESP_LOGD(TAG, "Resetting fan speed delay timer - conditions changed (temp_diff=%.2f, fan_mode=%d)", 
@@ -457,6 +456,8 @@ if (this->power_state_ == STATE::ON) {
     this->reached_temp_time_ = 0;
   }
 }
+      
+
    
  
   //##################################
