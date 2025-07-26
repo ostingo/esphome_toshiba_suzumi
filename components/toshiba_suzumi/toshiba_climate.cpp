@@ -1,6 +1,9 @@
 #include "toshiba_climate.h"
 #include "toshiba_climate_mode.h"
 #include "esphome/core/log.h"
+static void log_fan_command(float temp_diff, int fan_cmd, const char* fan_label) {
+    ESP_LOGI("toshiba_climate", "[Fan Cmd] temp_diff=%.2f, fan_cmd=%d (%s)", temp_diff, fan_cmd, fan_label);
+}
 
 namespace esphome {
 namespace toshiba_suzumi {
