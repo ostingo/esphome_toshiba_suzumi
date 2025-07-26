@@ -640,3 +640,4 @@ void ToshibaClimateUart::scan() {
 
 }  // namespace toshiba_suzumi
 }  // namespace esphome
+
