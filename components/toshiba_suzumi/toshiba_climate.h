@@ -68,6 +68,7 @@ class ToshibaClimateUart : public PollingComponent, public climate::Climate, pub
   uint32_t reached_temp_time_ = 0;    // Timestamp when target temp reached
 
  private:
+  std::string custom_fan_mode_ = ""; // Empty string means "no custom fan mode" set
   std::vector<uint8_t> rx_message_;
   std::vector<ToshibaCommand> command_queue_;
   uint32_t last_command_timestamp_ = 0;
