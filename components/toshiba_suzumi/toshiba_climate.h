@@ -48,7 +48,7 @@ class ToshibaClimateUart : public PollingComponent, public climate::Climate, pub
   void update() override;
   void scan();
   float get_setup_priority() const override { return setup_priority::LATE; }
-  void set_custom_fan_mode_(uint8_t mode); // <-- Add this line
+  void set_custom_fan_mode_(const std::string &mode);
   void set_outdoor_temp_sensor(sensor::Sensor *outdoor_temp_sensor) { outdoor_temp_sensor_ = outdoor_temp_sensor; }
   void set_pwr_select(select::Select *pws_select) { pwr_select_ = pws_select; }
   void set_horizontal_swing(bool enabled) { horizontal_swing_ = enabled; }
