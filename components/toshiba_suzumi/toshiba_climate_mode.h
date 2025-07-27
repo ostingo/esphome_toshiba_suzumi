@@ -33,9 +33,9 @@ constexpr const char* SPECIAL_MODE_COMFORT = "Comfort";
 enum class FAN {
   FAN_QUIET = 49,
   FAN_LOW = 50,
-  FANMODE_2 = 51,
+  FAN_CUSTOM2 = 51,
   FAN_MEDIUM = 52,
-  FANMODE_4 = 53,
+  FAN_CUSTOM4 = 53,
   FAN_HIGH = 54,
   FAN_AUTO = 65
 };
