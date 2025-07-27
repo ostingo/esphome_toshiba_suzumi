@@ -45,9 +45,9 @@ const climate::ClimateMode IntToClimateMode(MODE mode) {
 
 const optional<FAN> StringToFanLevel(std::string mode) {
   if (mode == CUSTOM_FAN_LEVEL_2) {
-    return FAN::FANMODE_2;
+    return FAN::FAN_CUSTOM2;
   } else if (mode == CUSTOM_FAN_LEVEL_4) {
-    return FAN::FANMODE_4;
+    return FAN::FAN_CUSTOM4;
   } else {
     return nullopt;
   }
@@ -55,9 +55,9 @@ const optional<FAN> StringToFanLevel(std::string mode) {
 
 const std::string IntToCustomFanMode(FAN mode) {
   switch (mode) {
-    case FAN::FANMODE_2:
+    case FAN::FAN_CUSTOM2:
       return CUSTOM_FAN_LEVEL_2;
-    case FAN::FANMODE_4:
+    case FAN::FAN_CUSTOM4:
       return CUSTOM_FAN_LEVEL_4;
     default:
       return "Unknown";
