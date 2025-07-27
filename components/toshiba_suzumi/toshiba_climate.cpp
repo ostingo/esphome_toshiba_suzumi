@@ -406,6 +406,7 @@ if (this->power_state_ == STATE::ON) {
       if (this->custom_fan_mode_ != CUSTOM_FAN_LEVEL_4) {
         this->set_custom_fan_mode_(CUSTOM_FAN_LEVEL_4);
         this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FANMODE_4));
+        log_fan_command(temp_diff, static_cast<uint8_t>(FAN::FAN_CUSTOM4), "CUSTOM4");
         ESP_LOGI(TAG, "Fan set to CUSTOM_LEVEL_4 (%.2f < temp_diff ≤ %.2f)", FAN_CUSTOM4_THRESHOLD, FAN_HIGH_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
@@ -413,6 +414,7 @@ if (this->power_state_ == STATE::ON) {
       if (this->fan_mode != CLIMATE_FAN_MEDIUM) {
         this->set_fan_mode_(CLIMATE_FAN_MEDIUM);
         this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_MEDIUM));
+        log_fan_command(temp_diff, static_cast<uint8_t>(FAN::FAN_MEDIUM), "MEDIUM");
         ESP_LOGI(TAG, "Fan set to MEDIUM (%.2f < temp_diff ≤ %.2f)", FAN_MEDIUM_THRESHOLD, FAN_CUSTOM4_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
@@ -420,6 +422,7 @@ if (this->power_state_ == STATE::ON) {
       if (this->custom_fan_mode_ != CUSTOM_FAN_LEVEL_2) {
         this->set_custom_fan_mode_ (CUSTOM_FAN_LEVEL_2);
         this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FANMODE_2));
+        log_fan_command(temp_diff, static_cast<uint8_t>(FAN::FAN_CUSTOM2), "CUSTOM2");
         ESP_LOGI(TAG, "Fan set to CUSTOM_LEVEL_2 (%.2f < temp_diff ≤ %.2f)", FAN_CUSTOM2_THRESHOLD, FAN_MEDIUM_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
@@ -427,6 +430,7 @@ if (this->power_state_ == STATE::ON) {
       if (this->fan_mode != CLIMATE_FAN_LOW) {
         this->set_fan_mode_(CLIMATE_FAN_LOW);
         this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_LOW));
+        log_fan_command(temp_diff, static_cast<uint8_t>(FAN::FAN_LOW), "LOW");
         ESP_LOGI(TAG, "Fan set to LOW (%.2f < temp_diff ≤ %.2f)", FAN_LOW_THRESHOLD, FAN_CUSTOM2_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
@@ -434,6 +438,7 @@ if (this->power_state_ == STATE::ON) {
       if (this->fan_mode != CLIMATE_FAN_QUIET) {
         this->set_fan_mode_(CLIMATE_FAN_QUIET);
         this->sendCmd(ToshibaCommandType::FAN, static_cast<uint8_t>(FAN::FAN_QUIET));
+        log_fan_command(temp_diff, static_cast<uint8_t>(FAN::FAN_QUIET), "QUIET");
         ESP_LOGI(TAG, "Fan set to QUIET (temp_diff ≤ %.2f)", FAN_QUIET_THRESHOLD);
         this->reached_temp_time_ = 0;
       }
