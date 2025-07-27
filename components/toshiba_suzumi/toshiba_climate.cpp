@@ -394,7 +394,18 @@ if (this->power_state_ == STATE::ON) {
              //temp_diff, is_heat_or_cool_mode, this->fan_mode);
     ESP_LOGI(TAG, "Entering fan logic block");
     ESP_LOGD(TAG, "Fan logic: temp_diff=%.2f, is_heat_or_cool=%d, fan_mode=%d", temp_diff, is_heat_or_cool_mode, this->fan_mode.has_value() ? static_cast<int>(this->fan_mode.value()) : -1);
+    
+ESP_LOGI(TAG, "[FAN DEBUG] power_state_=%d, cur=%.2f, tgt=%.2f, mode=%d", 
+    this->power_state_, this->current_temperature, this->target_temperature, this->mode);
+if (!isnan(this->current_temperature)) {
+    ESP_LOGI(TAG, "[FAN DEBUG] current_temperature is valid");
+}
+if (!isnan(this->target_temperature)) {
+    ESP_LOGI(TAG, "[FAN DEBUG] target_temperature is valid");
+} 
 
+
+      
     if (temp_diff > FAN_HIGH_THRESHOLD) {
       if (this->fan_mode != CLIMATE_FAN_HIGH) {
         this->set_fan_mode_(CLIMATE_FAN_HIGH);
