@@ -392,7 +392,7 @@ if (this->power_state_ == STATE::ON) {
 
     //ESP_LOGD(TAG, "Fan logic: temp_diff=%.2f, is_heat_or_cool=%d, current_fan=%d", 
              //temp_diff, is_heat_or_cool_mode, this->fan_mode);
-    ESP_LOGD(TAG, "Fan logic: temp_diff=%.2f, is_heat_or_cool=%d, fan_mode=%d", temp_diff, is_heat_or_cool, static_cast<int>(this->fan_mode));
+    ESP_LOGD(TAG, "Fan logic: temp_diff=%.2f, is_heat_or_cool=%d, fan_mode=%d", temp_diff, is_heat_or_cool=%d, static_cast<int>(this->fan_mode.value()) : -1);
 
     if (temp_diff > FAN_HIGH_THRESHOLD) {
       if (this->fan_mode != CLIMATE_FAN_HIGH) {
