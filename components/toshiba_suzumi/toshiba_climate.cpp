@@ -374,7 +374,7 @@ void ToshibaClimateUart::dump_config() {
   if (outdoor_temp_sensor_ != nullptr) {
     this->requestData(ToshibaCommandType::OUTDOOR_TEMP);
   }
-
+this->requestData(ToshibaCommandType::POWER_STATE);
    //#########################################
    // --- Enhanced Fan speed adjustment logic ---
 constexpr float FAN_QUIET_THRESHOLD = 0.5;     // ≤ 0.5°C → QUIET
